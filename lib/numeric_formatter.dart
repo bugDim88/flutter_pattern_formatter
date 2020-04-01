@@ -18,8 +18,9 @@ class ThousandsFormatter extends NumberInputFormatter {
 
   final NumberFormat formatter;
   final bool allowFraction;
+  int fractionDigits;
 
-  ThousandsFormatter({this.formatter, this.allowFraction = false})
+  ThousandsFormatter({this.formatter, this.allowFraction = false, this.fractionDigits = 2})
       : _decimalSeparator = (formatter ?? _formatter).symbols.DECIMAL_SEP,
         _decimalRegex = RegExp(allowFraction
             ? '[0-9]+([${(formatter ?? _formatter).symbols.DECIMAL_SEP}])?'
@@ -31,9 +32,11 @@ class ThousandsFormatter extends NumberInputFormatter {
   @override
   String _formatPattern(String digits) {
     if (digits == null || digits.isEmpty) return digits;
-    final number = allowFraction
+    var number = allowFraction
         ? double.tryParse(digits) ?? 0.0
         : int.tryParse(digits) ?? 0;
+    if (allowFraction)
+      number = (number * pow(10, fractionDigits + 2)) ~/ 100 / pow(10, fractionDigits);
     final result = (formatter ?? _formatter).format(number);
     if (allowFraction && digits.endsWith(_decimalSeparator)) {
       return '$result$_decimalSeparator';
