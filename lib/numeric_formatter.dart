@@ -33,7 +33,7 @@ class ThousandsFormatter extends NumberInputFormatter {
   String _formatPattern(String digits) {
     if (digits == null || digits.isEmpty) return digits;
     var number = allowFraction
-        ? double.tryParse(digits) ?? 0.0
+        ? (formatter ??_formatter).parse(digits) ?? 0.0
         : int.tryParse(digits) ?? 0;
     if (allowFraction)
       number = (number * pow(10, fractionDigits + 2)) ~/ 100 / pow(10, fractionDigits);
@@ -165,7 +165,7 @@ abstract class NumberInputFormatter extends TextInputFormatter {
   /// format user input with pattern formatter
   String _formatPattern(String digits);
 
-  /// validate user input
+  /// validate user input (remove all invalid characters)
   TextEditingValue _formatValue(
       TextEditingValue oldValue, TextEditingValue newValue);
 }

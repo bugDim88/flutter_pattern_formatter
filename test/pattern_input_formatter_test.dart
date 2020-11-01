@@ -1,7 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
-
 import 'package:pattern_formatter/pattern_formatter.dart';
 
 void main() {
@@ -10,11 +9,17 @@ void main() {
   group('date formatter smoke test', _dateFormatterSmokeTest);
 }
 
+const kNonBreakingSpace = '\xa0';
+
 _numericFormatterSmokeTest() {
   final ThousandsFormatter thousandsFormatter =
       ThousandsFormatter(formatter: NumberFormat.decimalPattern('en_US'));
+  final ThousandsFormatter thousandsRusFormatter =
+      ThousandsFormatter(formatter: NumberFormat.decimalPattern('ru'));
   final ThousandsFormatter decimalFormatter = ThousandsFormatter(
       formatter: NumberFormat.decimalPattern('en_US'), allowFraction: true);
+  final decimalRusFormatter = ThousandsFormatter(
+      formatter: NumberFormat.decimalPattern('ru'), allowFraction: true);
   final CreditCardFormatter creditCardFormatter = CreditCardFormatter();
 
   test('numeric filter smoke test', () {
@@ -41,6 +46,85 @@ _numericFormatterSmokeTest() {
     expect(newValue2.text, equals('12'));
 
     expect(newValue3.text, equals('12'));
+  });
+
+  test('thousands grouping smoke test rus', () {
+    /*final newValue = thousandsRusFormatter.formatEditUpdate(
+        TextEditingValue(
+            text: '12', selection: TextSelection.collapsed(offset: 2)),
+        TextEditingValue(
+            text: '12a', selection: TextSelection.collapsed(offset: 3)));
+
+    expect(newValue.text, equals('12'));
+
+    final newValue1 = thousandsRusFormatter.formatEditUpdate(
+        TextEditingValue(
+            text: '123', selection: TextSelection.collapsed(offset: 3)),
+        TextEditingValue(
+            text: '1234', selection: TextSelection.collapsed(offset: 4)));
+
+    expect(
+        newValue1,
+        TextEditingValue(
+            text: '1${kNonBreakingSpace}234',
+            selection: TextSelection.collapsed(offset: 5)));*/
+
+    final newValue2 = decimalRusFormatter.formatEditUpdate(
+        TextEditingValue(
+            text: '12', selection: TextSelection.collapsed(offset: 2)),
+        TextEditingValue(
+            text: '12,', selection: TextSelection.collapsed(offset: 3)));
+
+    expect(
+        newValue2,
+        TextEditingValue(
+            text: '12,', selection: TextSelection.collapsed(offset: 3)));
+
+    final newValue4 = decimalRusFormatter.formatEditUpdate(
+        TextEditingValue(
+            text: '1${kNonBreakingSpace}234',
+            selection: TextSelection.collapsed(offset: 5)),
+        TextEditingValue(
+            text: '1${kNonBreakingSpace}234,',
+            selection: TextSelection.collapsed(offset: 6)));
+
+    expect(newValue4.text, equals('1${kNonBreakingSpace}234,'));
+
+    final newValue5 = decimalRusFormatter.formatEditUpdate(
+        newValue4,
+        TextEditingValue(
+            text: '1${kNonBreakingSpace}234,5',
+            selection: TextSelection.collapsed(offset: 7)));
+
+    expect(newValue5.text, equals('1${kNonBreakingSpace}234,5'));
+
+    final newValue6 = decimalRusFormatter.formatEditUpdate(
+        TextEditingValue(
+            text: '1${kNonBreakingSpace}234,5',
+            selection: TextSelection.collapsed(offset: 3)),
+        TextEditingValue(
+            text: '1${kNonBreakingSpace}2134,5',
+            selection: TextSelection.collapsed(offset: 4)));
+
+    expect(
+        newValue6,
+        equals(TextEditingValue(
+            text: '12${kNonBreakingSpace}134,5',
+            selection: TextSelection.collapsed(offset: 4))));
+
+    final newValue7 = decimalRusFormatter.formatEditUpdate(
+        TextEditingValue(
+            text: '1${kNonBreakingSpace}234,55',
+            selection: TextSelection.collapsed(offset: 8)),
+        TextEditingValue(
+            text: '1${kNonBreakingSpace}234,556',
+            selection: TextSelection.collapsed(offset: 9)));
+
+    expect(
+        newValue7,
+        TextEditingValue(
+            text: '1${kNonBreakingSpace}234,55',
+            selection: TextSelection.collapsed(offset: 8)));
   });
 
   test('thousands grouping smoke test', () {
@@ -95,8 +179,20 @@ _numericFormatterSmokeTest() {
         newValue6,
         equals(TextEditingValue(
             text: '12,134.5', selection: TextSelection.collapsed(offset: 4))));
+
+    final newValue7 = decimalFormatter.formatEditUpdate(
+        TextEditingValue(
+            text: '1,234.55', selection: TextSelection.collapsed(offset: 8)),
+        TextEditingValue(
+            text: '1,234.556', selection: TextSelection.collapsed(offset: 9)));
+
+    expect(
+        newValue7,
+        TextEditingValue(
+            text: '1,234.55', selection: TextSelection.collapsed(offset: 8)));
   });
 
+  test('numeric grouping rus locale test', () {});
   test('credit card number grouping smoke test', () {
     final newValue1 = creditCardFormatter.formatEditUpdate(
         TextEditingValue(

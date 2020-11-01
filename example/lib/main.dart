@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pattern_formatter/pattern_formatter.dart';
-
+import 'package:intl/intl.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -62,7 +62,7 @@ class MyHomePage extends StatelessWidget {
                   keyboardType: TextInputType.number,
                   inputFormatters: [
                     LengthLimitingTextInputFormatter(15),
-                    ThousandsFormatter(allowFraction: true),
+                    ThousandsFormatter(formatter: NumberFormat.decimalPattern('ru'), allowFraction: true,),
                   ],
                   style: TextStyle(fontSize: 16.0, color: Colors.black),
                 ),
